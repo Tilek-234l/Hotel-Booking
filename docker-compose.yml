@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:12.0-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    networks:
+      - my-network
+    env_file:
+      - .env
+
+  web:
+    build: Hotel-Booking
+    command: sh -c "sleep 10 && python manage.py migrate && echo 'from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.filter(username=\"admin2@gmail.com\", email=\"admin2@gmail.com\").exists() or User.objects.create_superuser(\"admin2@gmail.com\", \"admin2@gmail.com\", \"admin\")' | python manage.py shell && python manage.py runserver 0.0.0.0:8000"
+    ports:
+      - 8080:8000
+    networks:
+      - my-network
+    depends_on:
+      - db
+    env_file:
+      - .env
+
+  redis:
+    image: redis:7.0.11
+    networks:
+      - my-network
+
+  celery-beat:
+    build: Hotel-Booking
+    command: celery -A config beat --loglevel=info
+    networks:
+      - my-network
+    depends_on:
+      - db
+      - redis
+
+volumes:
+  postgres_data:
+
+networks:
+  my-network:
