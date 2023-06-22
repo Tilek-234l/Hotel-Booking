@@ -1,6 +1,9 @@
 # chat/views.py
 from django.shortcuts import render
-
+from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from .models import Message
 
 def index(request):
     return render(request, "chat/index.html")
@@ -9,11 +12,6 @@ def index(request):
 def room(request, room_name):
     return render(request, "chat/room.html", {"room_name": room_name})
 
-
-from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
-from .models import Message
 
 def chat_room(request, room_name):
     return render(request, 'room.html', {'room_name': room_name})
