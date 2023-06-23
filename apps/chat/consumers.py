@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.tokens import TokenError, AccessToken
 from channels.generic.websocket import AsyncWebsocketConsumer
 
-from apps.chat.models import Message
+from apps.chat.models import Message, Room
 
 User = get_user_model()
 
@@ -26,13 +26,27 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
         self.room_group_name = f"chat_{self.room_name}"
-        # self.room = Room.objects.get_or_create(room_name=self.room_name)[0]
+        self.room = await self.get_or_create_room(self.room_name)
 
         await self.channel_layer.group_add(
             self.room_group_name, self.channel_name
         )
 
         await self.accept()
+
+        # Retrieve and send message history
+        messages = await self.get_message_history()
+        for message in messages:
+            await self.chat_message(message)
+
+        if self.scope["session"].get("anonymous"):
+            await self.channel_layer.group_send(
+                self.room_group_name, {
+                    "type": "chat_message",
+                    "message": "Joined the chat",
+                    "username": ""
+                }
+            )
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(
@@ -44,9 +58,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
             text_data_json = json.loads(text_data)
             message = text_data_json["message"]
             username = await self.get_username()
-            Message.objects.create(sender=username, message=message, chat=self.room)
-            Message.objects.filter(room=self.room)[:-10]
+
+            await self.create_message(username, message)
+
             if text_data_json.get("anonymous"):
+                self.scope["session"]["anonymous"] = True
                 username = "AnonymousUser"
 
             await self.channel_layer.group_send(
@@ -58,7 +74,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             )
         except json.JSONDecodeError as e:
             # Handle the JSONDecodeError here
-            print("Error decoding JSON:", )
+            print("Error decoding JSON:", e)
 
     async def chat_message(self, event):
         message = event["message"]
@@ -77,5 +93,20 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def get_username(self):
         if self.scope["user"].is_authenticated:
             return self.scope["user"].username
-        else:
+        elif self.scope["session"].get("anonymous"):
             return "AnonymousUser"
+        else:
+            return "Guest"
+
+    @database_sync_to_async
+    def get_or_create_room(self, room_name):
+        return Room.objects.get_or_create(room_name=room_name)[0]
+
+    @database_sync_to_async
+    def get_message_history(self):
+        messages = Message.objects.filter(room=self.room).order_by('timestamp')
+        return list(messages.values('message', 'username', 'timestamp'))
+
+    @database_sync_to_async
+    def create_message(self, username, message):
+        return Message.objects.create(room=self.room, username=username, message=message)
