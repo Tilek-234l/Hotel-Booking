@@ -63,7 +63,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
             if text_data_json.get("anonymous"):
                 self.scope["session"]["anonymous"] = True
-                username = "AnonymousUser"
 
             await self.channel_layer.group_send(
                 self.room_group_name, {
