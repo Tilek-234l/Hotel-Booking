@@ -76,13 +76,15 @@
         }
 
         function sendMessage2() {
-            const message = messageInput2.value;
-            chatSocket.send(JSON.stringify({
-                'username': 'User 2',
-                'message': message
-            }));
-            messageInput2.value = '';
-        }
+    const message = messageInput2.value;
+    chatSocket.send(JSON.stringify({
+        'username': 'User 2',
+        'message': message,
+        'anonymous': true  // Flag indicating that the message is from the second user
+    }));
+    messageInput2.value = '';
+}
+
     </script>
 </body>
 </html>

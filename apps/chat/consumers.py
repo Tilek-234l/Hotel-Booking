@@ -4,6 +4,8 @@ from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.tokens import TokenError, AccessToken
 from channels.generic.websocket import AsyncWebsocketConsumer
 
+from apps.chat.models import Message
+
 User = get_user_model()
 
 
@@ -24,6 +26,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
         self.room_group_name = f"chat_{self.room_name}"
+        # self.room = Room.objects.get_or_create(room_name=self.room_name)[0]
 
         await self.channel_layer.group_add(
             self.room_group_name, self.channel_name
@@ -37,17 +40,25 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
     async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        message = text_data_json["message"]
-        username = await self.get_username()
+        try:
+            text_data_json = json.loads(text_data)
+            message = text_data_json["message"]
+            username = await self.get_username()
+            Message.objects.create(sender=username, message=message, chat=self.room)
+            Message.objects.filter(room=self.room)[:-10]
+            if text_data_json.get("anonymous"):
+                username = "AnonymousUser"
 
-        await self.channel_layer.group_send(
-            self.room_group_name, {
-                "type": "chat_message",
-                "message": message,
-                "username": username
-            }
-        )
+            await self.channel_layer.group_send(
+                self.room_group_name, {
+                    "type": "chat_message",
+                    "message": message,
+                    "username": username
+                }
+            )
+        except json.JSONDecodeError as e:
+            # Handle the JSONDecodeError here
+            print("Error decoding JSON:", )
 
     async def chat_message(self, event):
         message = event["message"]
