@@ -1,10 +1,10 @@
-from django.db import models
 from django.db.models import Avg
 from rest_framework import generics, permissions
 from django_filters.rest_framework import DjangoFilterBackend
+
+from . import serializers
 from .models import Review, Rating, RoomType, Room
-from .serializers import ReviewCreateSerializer, CreateRatingSerializer, RoomDetailSerializer, \
-    RoomListSerializer, RoomSerializer
+from .serializers import ReviewCreateSerializer, CreateRatingSerializer, RoomDetailSerializer, RoomListSerializer, RoomSerializer
 
 
 class RoomListView(generics.ListAPIView):
@@ -22,14 +22,8 @@ class RoomListView(generics.ListAPIView):
 
 class RoomDetailView(generics.RetrieveAPIView):
     """Детальный вывод типа комнаты"""
-    queryset = Room.objects.filter()
+    queryset = Room.objects.all()
     serializer_class = RoomDetailSerializer
-
-    def get_queryset(self):
-        queryset = Room.objects.annotate(
-            middle_star=Avg('ratings__star')
-        )
-        return queryset
 
 
 class RoomListAPIView(generics.ListAPIView):
@@ -59,7 +53,7 @@ class AddStarRatingView(generics.CreateAPIView):
     """Добавление рейтинга отелю"""
     serializer_class = CreateRatingSerializer
     queryset = Rating.objects.all()
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
         serializer.save(room=self.get_room())

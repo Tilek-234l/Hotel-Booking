@@ -19,12 +19,24 @@ class RecursiveSerializer(serializers.Serializer):
 
 class RoomListSerializer(serializers.ModelSerializer):
     """Список отелей"""
-    rating_user = serializers.BooleanField()
+    room_type_name = serializers.CharField(source='room_type.name')
+    room_number = serializers.CharField()
+    price = serializers.IntegerField()
+    is_booked = serializers.SerializerMethodField()
     middle_star = serializers.IntegerField()
 
     class Meta:
         model = Room
-        fields = ("id", "rating_user", "middle_star")
+        fields = ("id", "room_type_name", "room_number", "price", "is_booked", "middle_star")
+
+    def get_is_booked(self, obj):
+        if obj.is_booked:
+            return "False"
+        else:
+            return "True"
+
+
+
 
 
 class ReviewCreateSerializer(serializers.ModelSerializer):
@@ -82,6 +94,9 @@ class CreateRatingSerializer(serializers.ModelSerializer):
 
 
 class RoomSerializer(serializers.ModelSerializer):
+    room_type_name = serializers.ReadOnlyField(source='room_type.name')
+    room_type_description = serializers.ReadOnlyField(source='room_type.description')
+
     class Meta:
         model = Room
-        fields = ['id', 'room_type', 'room_number', 'price', 'is_booked']
+        fields = ['id', 'room_type', 'room_number', 'price', 'is_booked', 'room_type_name', 'room_type_description']

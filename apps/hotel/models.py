@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db import models
 
 from django.utils.translation import gettext_lazy as _
@@ -80,6 +81,13 @@ class Room(models.Model):
     is_booked = models.BooleanField(
         _("Is Booked"),
         default=False
+    )
+    rating_user = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name='rated_rooms',
+        null=True,
+        blank=True
     )
 
     def __str__(self):
