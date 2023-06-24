@@ -11,10 +11,10 @@ services:
       - .env
 
   web:
-    build: Hotel-Booking
+    build: .
     command: sh -c "sleep 10 && python manage.py migrate && echo 'from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.filter(username=\"admin2@gmail.com\", email=\"admin2@gmail.com\").exists() or User.objects.create_superuser(\"admin2@gmail.com\", \"admin2@gmail.com\", \"admin\")' | python manage.py shell && python manage.py runserver 0.0.0.0:8000"
     ports:
-      - 8080:8000
+      - 80:8000
     networks:
       - my-network
     depends_on:
@@ -23,18 +23,10 @@ services:
       - .env
 
   redis:
-    image: redis:7.0.11
+    image: redis:7.2-rc
     networks:
       - my-network
 
-  celery-beat:
-    build: Hotel-Booking
-    command: celery -A config beat --loglevel=info
-    networks:
-      - my-network
-    depends_on:
-      - db
-      - redis
 
 volumes:
   postgres_data:
