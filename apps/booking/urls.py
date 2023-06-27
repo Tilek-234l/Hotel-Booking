@@ -7,5 +7,5 @@ router = routers.DefaultRouter()
 router.register(r'booking', BookingCreateViewSet)
 
 urlpatterns = [
-    path('booking/<int:pk>/', BookingCreateViewSet.as_view({'get': 'retrieve'}), name='booking-detail'),
+    path('booking/booking/<int:pk>/', BookingCreateViewSet.as_view({'get': 'retrieve'}), name='booking-detail'),
 ] + router.urls

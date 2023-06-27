@@ -1,3 +1,4 @@
+from rest_framework.serializers import ModelSerializer
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
@@ -6,6 +7,12 @@ from .serializers import BookingSerializer
 from .models import Booking
 from apps.hotel.models import Room
 from rest_framework.exceptions import ValidationError
+
+
+class BookingRoomSerializer(ModelSerializer):
+    class Meta:
+        model = Room
+        fields = ['id', 'room_number', 'price', 'room_type']
 
 
 class BookingCreateViewSet(ModelViewSet):
@@ -61,3 +68,4 @@ class BookingCreateAPIView(BookingCreateViewSet):
             },
             status=status.HTTP_201_CREATED
         )
+

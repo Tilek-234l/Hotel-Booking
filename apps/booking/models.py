@@ -14,7 +14,6 @@ User = get_user_model()
 
 
 class Booking(models.Model):
-    id = models.AutoField(primary_key=True)
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

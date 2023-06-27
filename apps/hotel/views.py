@@ -1,10 +1,15 @@
-from django.db.models import Avg
-from rest_framework import generics, permissions
+from venv import logger
+
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils import timezone
-from . import serializers
 from .models import Review, Rating, RoomType, Room
+from .permissions import IsOwnerOrReadOnly
 from .serializers import ReviewCreateSerializer, CreateRatingSerializer, RoomDetailSerializer, RoomListSerializer, RoomSerializer
+from rest_framework import generics, permissions, status
+import logging
+from rest_framework import mixins, viewsets
+from rest_framework.response import Response
+from .serializers import RoomSerializer
 
 
 class RoomListView(generics.ListAPIView):
@@ -14,15 +19,16 @@ class RoomListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        queryset = Room.objects.annotate(
+        queryset = Room.objects.all(
         )
         return queryset
 
 
-class RoomDetailView(generics.RetrieveAPIView):
+class RoomDetailView(generics.RetrieveDestroyAPIView):
     """Детальный вывод типа комнаты"""
     queryset = Room.objects.all()
     serializer_class = RoomDetailSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class RoomListAPIView(generics.ListAPIView):
@@ -62,3 +68,17 @@ class AddStarRatingView(generics.CreateAPIView):
         room_id = self.kwargs.get('room_id')
         room = Room.objects.get(id=room_id)
         return room
+
+
+class RoomViewSet(generics.CreateAPIView):
+    queryset = Room.objects.order_by('id')
+    serializer_class = RoomSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.is_deleted = True
+        instance.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+

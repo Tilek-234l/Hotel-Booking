@@ -1,6 +1,9 @@
-from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field
 
 from .models import Review, Rating, RoomType, Room
+
+from rest_framework import serializers
+from .models import Room
 
 
 class FilterReviewListSerializer(serializers.ListSerializer):
@@ -17,25 +20,11 @@ class RecursiveSerializer(serializers.Serializer):
         return serializer.data
 
 
-
-
 class RoomListSerializer(serializers.ModelSerializer):
-    room_type = serializers.CharField(source='room_type.name')
-    room_number = serializers.CharField()
-    price = serializers.IntegerField()
-    is_booked = serializers.BooleanField()
-    image_url = serializers.SerializerMethodField()
-
-    def get_image_url(self, room):
-        if room.image:
-            request = self.context.get('request')
-            return request.build_absolute_uri(room.image.url)
-        return None
 
     class Meta:
         model = Room
-        fields = ('room_type', 'room_number', 'price', 'is_booked', 'image_url')
-
+        fields = ['id', 'room_number', 'price', 'room_type', 'is_booked']
 
 
 class ReviewCreateSerializer(serializers.ModelSerializer):
@@ -68,7 +57,6 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 class RoomDetailSerializer(serializers.ModelSerializer):
     reviews = ReviewSerializer(many=True)
-    average_rating = serializers.FloatField(source='middle_star')
 
     class Meta:
         model = Room
@@ -95,6 +83,9 @@ class RoomSerializer(serializers.ModelSerializer):
     room_type_name = serializers.ReadOnlyField(source='room_type.name')
     room_type_description = serializers.ReadOnlyField(source='room_type.description')
 
+    def create(self, validated_data):
+        room = Room.objects.create(**validated_data)
+        return room
     class Meta:
         model = Room
         fields = ['id', 'room_type', 'room_number', 'price', 'is_booked', 'room_type_name', 'room_type_description']

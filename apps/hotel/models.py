@@ -63,11 +63,6 @@ class RoomType(models.Model):
         verbose_name_plural = _("Room Types")
 
 
-from django.conf import settings
-from django.contrib.auth import get_user_model
-from django.db import models
-from django.utils.translation import gettext_lazy as _
-
 class Room(models.Model):
     room_type = models.ForeignKey(
         'RoomType',
@@ -94,22 +89,10 @@ class Room(models.Model):
         null=True,
         blank=True
     )
-    image = models.ImageField(
-        _("Room Image"),
-        upload_to="media/room_photos/",
-        null=True,
-        blank=True,
-        default="media/room_photos/default.jpg"
-    )
+
 
     def __str__(self):
         return f"Room {self.room_number} at {self.room_type.name}"
-
-    @property
-    def image_url(self):
-        if self.image:
-            return self.image.url
-        return ""
 
     class Meta:
         verbose_name = _("Room")
