@@ -89,6 +89,7 @@ class Room(models.Model):
         null=True,
         blank=True
     )
+    middle_star = models.DecimalField(max_digits=2, decimal_places=1)
 
     def __str__(self):
         return f"Room {self.room_number} at {self.room_type.name}"

@@ -49,6 +49,7 @@ MY_APPS = [
 
 ]
 INSTALLED_APPS = [
+    'jazzmin',
     'daphne',
     'django.contrib.admin',
     'django.contrib.auth',

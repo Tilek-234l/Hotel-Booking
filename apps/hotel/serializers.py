@@ -46,7 +46,6 @@ class RoomListSerializer(serializers.ModelSerializer):
         return None
 
 
-
 class ReviewCreateSerializer(serializers.ModelSerializer):
     """Добавление отзыва"""
 
@@ -76,13 +75,13 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class RoomDetailSerializer(serializers.ModelSerializer):
-    """Детальный вид номера"""
     reviews = ReviewSerializer(many=True)
     average_rating = serializers.FloatField(source='middle_star')
 
     class Meta:
         model = Room
         fields = "__all__"
+
 
 
 class CreateRatingSerializer(serializers.ModelSerializer):
