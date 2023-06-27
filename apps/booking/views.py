@@ -5,6 +5,7 @@ from rest_framework import status, permissions
 from .serializers import BookingSerializer
 from .models import Booking
 from apps.hotel.models import Room
+from rest_framework.exceptions import ValidationError
 
 
 class BookingCreateViewSet(ModelViewSet):
@@ -38,13 +39,20 @@ class BookingCreateViewSet(ModelViewSet):
 
 class BookingCreateAPIView(BookingCreateViewSet):
     def create_booking(self, request):
-        room_id = 1
+        room_id = 1  # ID комнаты, которую хотите забронировать
         room = Room.objects.get(id=room_id)
         booking = Booking.objects.create(room=room)
 
+        # Дополнительные действия при создании бронирования
+        # Например, отправка уведомления пользователю о бронировании
+
+        # Получаем доступные комнаты и даты для бронирования
         available_rooms, available_dates = booking.get_available_rooms()
 
+        # Возвращаем ответ с информацией о созданном бронировании и доступных комнатах/датах
         serializer = self.get_serializer(booking)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=request.user)
         return Response(
             {
                 'booking': serializer.data,

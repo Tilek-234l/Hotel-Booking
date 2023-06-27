@@ -17,33 +17,13 @@ class RecursiveSerializer(serializers.Serializer):
         return serializer.data
 
 
-
 class RoomListSerializer(serializers.ModelSerializer):
     """Список отелей"""
-    room_type_name = serializers.CharField(source='room_type.name')
-    room_number = serializers.CharField()
-    price = serializers.IntegerField()
-    is_booked = serializers.SerializerMethodField()
-    middle_star = serializers.IntegerField()
-    img = serializers.SerializerMethodField()
+    rating_user = serializers.BooleanField()
 
     class Meta:
         model = Room
-        fields = ("id", "room_type_name", "room_number", "price", "is_booked", "middle_star", "img")
-
-    def get_is_booked(self, obj):
-        if obj.is_booked:
-            return False
-        return True
-
-    def get_img(self, obj):
-        request = self.context.get('request')
-        room_photos = obj.roomphotos_set.all()
-        if room_photos:
-            image_url = room_photos[0].image.url
-            full_url = request.build_absolute_uri(image_url)
-            return full_url
-        return None
+        fields = ("id", "rating_user")
 
 
 class ReviewCreateSerializer(serializers.ModelSerializer):
@@ -81,7 +61,6 @@ class RoomDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Room
         fields = "__all__"
-
 
 
 class CreateRatingSerializer(serializers.ModelSerializer):

@@ -15,7 +15,6 @@ class RoomListView(generics.ListAPIView):
 
     def get_queryset(self):
         queryset = Room.objects.annotate(
-            middle_star=Avg('ratings__star')
         )
         return queryset
 

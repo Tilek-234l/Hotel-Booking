@@ -1,12 +1,17 @@
 from rest_framework import serializers
 from .models import Booking
+from apps.hotel.models import Room
+
+
+class BookingRoomSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Room
+        fields = ['id', 'room_number', 'price', 'room_type']
 
 
 class BookingSerializer(serializers.ModelSerializer):
-    created_at = serializers.DateTimeField(read_only=True)
+    room = BookingRoomSerializer()
 
     class Meta:
         model = Booking
         fields = ['id', 'user', 'room', 'checkin_date', 'checkout_date', 'created_at']
-        read_only_fields = ['id', 'user', 'room', 'created_at']
-

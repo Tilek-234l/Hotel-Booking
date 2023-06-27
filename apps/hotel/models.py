@@ -80,7 +80,7 @@ class Room(models.Model):
     )
     is_booked = models.BooleanField(
         _("Is Booked"),
-        default=False
+        default=True
     )
     rating_user = models.ForeignKey(
         get_user_model(),
@@ -89,7 +89,6 @@ class Room(models.Model):
         null=True,
         blank=True
     )
-    middle_star = models.DecimalField(max_digits=2, decimal_places=1)
 
     def __str__(self):
         return f"Room {self.room_number} at {self.room_type.name}"
@@ -145,7 +144,7 @@ class Rating(models.Model):
     room = models.ForeignKey(
         Room,
         on_delete=models.CASCADE,
-        verbose_name="room",
+        verbose_name=_("room"),
         related_name="ratings",
         default=0
     )

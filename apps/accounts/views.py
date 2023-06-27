@@ -3,7 +3,7 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .serializers import UserSerializer, TokenObtainPairSerializer
+from .serializers import UserSerializer, TokenObtanPairSerializer
 
 User = get_user_model()
 
@@ -24,5 +24,5 @@ class UserRegisterView(generics.CreateAPIView):
 
 
 class UserLoginView(TokenObtainPairView):
-    serializer_class = TokenObtainPairSerializer
+    serializer_class = TokenObtanPairSerializer
     permission_classes = (permissions.AllowAny,)

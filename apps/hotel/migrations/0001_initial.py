@@ -46,7 +46,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('room_number', models.CharField(blank=True, max_length=100, null=True, unique=True, verbose_name='Room Number')),
                 ('price', models.PositiveIntegerField(verbose_name='Price')),
-                ('is_booked', models.BooleanField(default=False, verbose_name='Is Booked')),
+                ('is_booked', models.BooleanField(default=True, verbose_name='Is Booked')),
                 ('middle_star', models.DecimalField(decimal_places=1, max_digits=2)),
                 ('rating_user', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='rated_rooms', to=settings.AUTH_USER_MODEL)),
             ],

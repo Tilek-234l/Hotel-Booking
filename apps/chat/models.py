@@ -7,7 +7,6 @@ User = get_user_model()
 
 class Room(models.Model):
     room_name = models.CharField(max_length=100)
-    middle_star = models.FloatField(null=True, blank=True)  # Add this field
 
     def __str__(self):
         return self.room_name

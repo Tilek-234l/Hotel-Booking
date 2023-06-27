@@ -25,9 +25,8 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
-class TokenObtainPairSerializer(serializers.Serializer):
+class TokenObtanPairSerializer(serializers.Serializer):
     username_field = User.USERNAME_FIELD
-
     default_error_messages = {
         'no_active_account': 'No active account found with the given credentials'
     }
