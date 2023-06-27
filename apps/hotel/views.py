@@ -1,7 +1,7 @@
 from django.db.models import Avg
 from rest_framework import generics, permissions
 from django_filters.rest_framework import DjangoFilterBackend
-
+from django.utils import timezone
 from . import serializers
 from .models import Review, Rating, RoomType, Room
 from .serializers import ReviewCreateSerializer, CreateRatingSerializer, RoomDetailSerializer, RoomListSerializer, RoomSerializer
@@ -38,7 +38,8 @@ class RoomListAPIView(generics.ListAPIView):
             return Room.objects.exclude(
                 booking__check_out_date__gte=check_in_date,
                 booking__check_in_date__lte=check_out_date
-            )
+            ).filter(booking__check_out_date__gte=timezone.now())
+
         return Room.objects.all()
 
 

@@ -105,7 +105,7 @@ class RoomPhotos(models.Model):
     )
     room = models.ForeignKey(
         Room,
-        verbose_name='Room',
+        verbose_name=_('Room'),
         on_delete=models.CASCADE
     )
 

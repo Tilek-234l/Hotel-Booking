@@ -1,8 +1,10 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 from rest_framework import status, permissions
 from .serializers import BookingSerializer
 from .models import Booking
+from apps.hotel.models import Room
 
 
 class BookingCreateViewSet(ModelViewSet):
@@ -18,8 +20,36 @@ class BookingCreateViewSet(ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def perform_create(self, serializer):
+        room = serializer.validated_data['room']
+
+        # Проверяем, доступен ли номер комнаты для бронирования
+        if room.is_booked:
+            raise ValidationError("The room is already booked.")
+
+        # Устанавливаем значение is_booked в True
+        room.is_booked = True
+        room.save()
+
+        # Сохраняем бронирование
         serializer.save(
             user=self.request.user,
-
         )
 
+
+class BookingCreateAPIView(BookingCreateViewSet):
+    def create_booking(self, request):
+        room_id = 1
+        room = Room.objects.get(id=room_id)
+        booking = Booking.objects.create(room=room)
+
+        available_rooms, available_dates = booking.get_available_rooms()
+
+        serializer = self.get_serializer(booking)
+        return Response(
+            {
+                'booking': serializer.data,
+                'available_rooms': available_rooms,
+                'available_dates': available_dates,
+            },
+            status=status.HTTP_201_CREATED
+        )
