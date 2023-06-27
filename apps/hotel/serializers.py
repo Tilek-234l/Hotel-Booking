@@ -17,13 +17,25 @@ class RecursiveSerializer(serializers.Serializer):
         return serializer.data
 
 
+
+
 class RoomListSerializer(serializers.ModelSerializer):
-    """Список отелей"""
-    rating_user = serializers.BooleanField()
+    room_type = serializers.CharField(source='room_type.name')
+    room_number = serializers.CharField()
+    price = serializers.IntegerField()
+    is_booked = serializers.BooleanField()
+    image_url = serializers.SerializerMethodField()
+
+    def get_image_url(self, room):
+        if room.image:
+            request = self.context.get('request')
+            return request.build_absolute_uri(room.image.url)
+        return None
 
     class Meta:
         model = Room
-        fields = ("id", "rating_user")
+        fields = ('room_type', 'room_number', 'price', 'is_booked', 'image_url')
+
 
 
 class ReviewCreateSerializer(serializers.ModelSerializer):
