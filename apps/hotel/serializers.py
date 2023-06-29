@@ -21,10 +21,17 @@ class RecursiveSerializer(serializers.Serializer):
 
 
 class RoomListSerializer(serializers.ModelSerializer):
+    image_url = serializers.SerializerMethodField()
+
+    def get_image_url(self, room):
+        if room.image:
+            return self.context['request'].build_absolute_uri(room.image.url)
+        return None
+
 
     class Meta:
         model = Room
-        fields = ['id', 'room_number', 'price', 'room_type', 'is_booked']
+        fields = ['id', 'room_number', 'price', 'room_type', 'is_booked', "image_url",]
 
 
 class ReviewCreateSerializer(serializers.ModelSerializer):

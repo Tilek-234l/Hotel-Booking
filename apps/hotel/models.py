@@ -80,7 +80,7 @@ class Room(models.Model):
     )
     is_booked = models.BooleanField(
         _("Is Booked"),
-        default=True
+        default=False
     )
     rating_user = models.ForeignKey(
         get_user_model(),
@@ -89,10 +89,15 @@ class Room(models.Model):
         null=True,
         blank=True
     )
-
+    image = models.ImageField(
+        _("Room Image"),
+        upload_to="room_photos/",
+        null=True,
+        blank=True
+    )
 
     def __str__(self):
-        return f"Room {self.room_number} at {self.room_type.name}"
+        return f"Room {self.room_number} ({self.room_type.name})"
 
     class Meta:
         verbose_name = _("Room")

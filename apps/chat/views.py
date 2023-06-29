@@ -28,7 +28,6 @@ def save_message(request):
         return JsonResponse({'status': 'success'})
 
 
-
 def get_messages(request):
     messages = Message.objects.all()
     data = [{'username': message.username, 'message': message.message} for message in messages]
