@@ -6,7 +6,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure--rhgb7n=j44=w*d^+f463vmd04c_@(su^n$q7s#==jq=7(4m*3'
 
 DEBUG = True
-
 ALLOWED_HOSTS = ['*']
 
 DATABASES = {
@@ -27,7 +26,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("localhost", 6379)],
+            "hosts": [("localhost", 8080)],
         },
     },
 }

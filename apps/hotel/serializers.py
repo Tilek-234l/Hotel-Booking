@@ -28,7 +28,6 @@ class RoomListSerializer(serializers.ModelSerializer):
             return self.context['request'].build_absolute_uri(room.image.url)
         return None
 
-
     class Meta:
         model = Room
         fields = ['id', 'room_number', 'price', 'room_type', 'is_booked', "image_url",]
